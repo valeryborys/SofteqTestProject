@@ -24,30 +24,17 @@ public class PageParserImpl implements Parser {
 	private Pattern pattern;
 	private Matcher matcher;
 
-	public String getPageText(String sourceCode) {
+	public String getPageText(String sourceCode) throws XMLStreamException {
 		reader = fixer.getFixedHtmlReader(sourceCode);
 		StringBuilder sb = new StringBuilder();
-		try {
-			while (reader.hasNext()) {
-				int type = reader.next();
-				if (type == XMLStreamReader.CHARACTERS) {
-					sb.append(reader.getText().trim()).append(" ");
-				}
+		while (reader.hasNext()) {
+			int type = reader.next();
+			if (type == XMLStreamReader.CHARACTERS) {
+				sb.append(reader.getText().trim()).append(" ");
 			}
-		} catch (XMLStreamException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			if (reader != null)
-				try {
-					reader.close();
-				} catch (XMLStreamException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 		}
+		reader.close();
 		return sb.toString();
-
 	}
 
 	public String getSourceCode(URL url) throws IOException, XMLStreamException {
@@ -66,18 +53,18 @@ public class PageParserImpl implements Parser {
 			if (type == XMLStreamReader.START_ELEMENT) {
 				if (reader.getLocalName().equals("meta")) {
 					attributeValue = reader.getAttributeValue(null, "charset");
-					if (attributeValue == null) {
-						continue;
+					if (attributeValue != null) {
+						return attributeValue;
 					}
 				}
 			}
 		}
-		return (attributeValue == null) ? "utf-8" : attributeValue;
+		reader.close();
+		return "UTF-8";
 	}
 
 	public Map<String, Integer> countGivenWords(Map<String, Integer> words, String pageContent) {
-		Set<Entry<String, Integer>> entrySet = words.entrySet();
-		for (Entry<String, Integer> entry : entrySet) {
+		for (Entry<String, Integer> entry : words.entrySet()) {
 			pattern = Pattern.compile(entry.getKey(), Pattern.CASE_INSENSITIVE);
 			matcher = pattern.matcher(pageContent);
 			int count = 0;
@@ -89,65 +76,50 @@ public class PageParserImpl implements Parser {
 		return words;
 	}
 
-	public String deleteTagsWithContent(String sourceCode, String tagName) {// TODO replacing by simple matching without
-																			// recursion
-		String startTagName = "<" + tagName;
-		String endTagName = "</" + tagName + ">";
+	public String deleteTagsWithContent(String sourceCode, String startTagName, String endTagName) {
 		StringBuilder sb = new StringBuilder(sourceCode);
-		pattern = Pattern.compile(startTagName);
+		pattern = Pattern.compile(startTagName, Pattern.CASE_INSENSITIVE);
 		Matcher matcherOpenTag = pattern.matcher(sourceCode);
 		if (matcherOpenTag.find()) {
 			int startTag = matcherOpenTag.start();
-			Pattern p = Pattern.compile(endTagName);
+			Pattern p = Pattern.compile(endTagName, Pattern.CASE_INSENSITIVE);
 			Matcher matcherCloseTag = p.matcher(sourceCode);
-			matcherCloseTag.find();
-			int endTag = matcherCloseTag.end();
-			sb.replace(startTag, endTag, "");
-			sourceCode = deleteTagsWithContent(sb.toString(), tagName);
+			if (matcherCloseTag.find(startTag)) {
+				int endTag = matcherCloseTag.end();
+				sb.replace(startTag, endTag, "");
+				sourceCode = deleteTagsWithContent(sb.toString(), startTagName, endTagName);
+			}
 		}
 		return sourceCode;
 	}
 
-	public Set<String> matchURLs(Page page) {
+	public Set<String> matchURLs(Page page) throws XMLStreamException {
 		reader = fixer.getFixedHtmlReader(page.getSourceCode());
 		Set<String> urlSet = new HashSet<String>();
 		int type = 0;
-		try {
-			while (reader.hasNext()) {
-				type = reader.next();
-				if (type == XMLStreamReader.START_ELEMENT) {
-					if (reader.getLocalName().equals("a")) {
-						String attributeValue = reader.getAttributeValue(null, "href");
-						if (attributeValue == null || attributeValue.length() <= 1) {
-							continue;
-						}
-						if (attributeValue.substring(0, 2).equals("//")) {
-							attributeValue = page.getUrl().getProtocol() + ":" + attributeValue;
-							urlSet.add(attributeValue);
-						} else if (attributeValue.charAt(0) == '/' && Character.isLetter(attributeValue.charAt(1))) {
-							attributeValue = page.getUrl().getProtocol() + "://" + page.getUrl().getHost()
-									+ attributeValue;
-							urlSet.add(attributeValue);
-						} else if (!Character.isLetter(attributeValue.charAt(0))) {
-							continue;
-						} else {
-							urlSet.add(attributeValue);
-						}
+		while (reader.hasNext()) {
+			type = reader.next();
+			if (type == XMLStreamReader.START_ELEMENT) {
+				if (reader.getLocalName().equals("a")) {
+					String attributeValue = reader.getAttributeValue(null, "href");
+					if (attributeValue == null || attributeValue.length() <= 1) {
+						continue;
+					}
+					if (attributeValue.substring(0, 2).equals("//")) {
+						attributeValue = page.getUrl().getProtocol() + ":" + attributeValue;
+						urlSet.add(attributeValue);
+					} else if (attributeValue.charAt(0) == '/' && Character.isLetter(attributeValue.charAt(1))) {
+						attributeValue = page.getUrl().getProtocol() + "://" + page.getUrl().getHost() + attributeValue;
+						urlSet.add(attributeValue);
+					} else if (!Character.isLetter(attributeValue.charAt(0))) {
+						continue;
+					} else {
+						urlSet.add(attributeValue);
 					}
 				}
 			}
-		} catch (XMLStreamException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			if (reader != null)
-				try {
-					reader.close();
-				} catch (XMLStreamException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 		}
+		reader.close();
 		return urlSet;
 	}
 
@@ -157,7 +129,7 @@ public class PageParserImpl implements Parser {
 		BufferedReader in = null;
 		try {
 			if (charset.isEmpty()) {
-				in = new BufferedReader(new InputStreamReader(url.openStream()));
+				in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
 			} else {
 				in = new BufferedReader(new InputStreamReader(url.openStream(), charset));
 			}
@@ -167,12 +139,7 @@ public class PageParserImpl implements Parser {
 			}
 		} finally {
 			if (in != null) {
-				try {
-					in.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				in.close();
 			}
 		}
 		return code.toString();

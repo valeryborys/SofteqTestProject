@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>by.softeq</groupId>
 	<artifactId>borys</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+ 	<version>0.0.1-SNAPSHOT</version> 
 	<name>SofteqTestProject</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,6 +23,24 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+				<encoding>UTF-8</encoding>
+					<archive>
+						<manifest>
+							<mainClass>by.softeq.borys.Main</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

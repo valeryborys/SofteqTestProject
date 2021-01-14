@@ -19,15 +19,16 @@ public class PageParserImplTest {
 	@Test
 	public void deleteScriptsInSourceCodeTest() {
 		parser = new PageParserImpl();
-		String deleted = parser.deleteTagsWithContent(ConstantStringValues.SCRIPT_DELETION_INPUT, "script");
+		String deleted = parser.deleteTagsWithContent(ConstantStringValues.SCRIPT_DELETION_INPUT, "<script", "</script>");
+		//deleted = parser.deleteTagsWithContent(ConstantStringValues.SCRIPT_DELETION_INPUT, "<script ", ">");
 		assertEquals(ConstantStringValues.SCRIPT_DELETION_EXPECTATION, deleted);
 		
 	}
 	
-	@Test
+	//@Test
 	public void getPageText() {
-		String pageText = parser.getPageText(ConstantStringValues.TEXT_SEPARATION_INPUT);
-		assertEquals(ConstantStringValues.TEXT_SEPARATION_EXPECTATION, pageText);
+		//String pageText = parser.getPageText(ConstantStringValues.TEXT_SEPARATION_INPUT);
+		//assertEquals(ConstantStringValues.TEXT_SEPARATION_EXPECTATION, pageText);
 		
 	}
 	

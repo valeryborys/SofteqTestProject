@@ -35,19 +35,10 @@ public class HtmlErrorsFixer {
 	private static final XMLOutputFactory OUTPUT_FACTORY = XMLOutputFactory.newInstance();
 	private static final String TAGSOUP_PARSER_CLASS = "org.ccil.cowan.tagsoup.Parser";
 	private static XMLReader xmlReader;
-	private ByteArrayOutputStream output;
-
-	public ByteArrayOutputStream getOutput() {
-		return output;
-	}
-
-	private void setOutput(ByteArrayOutputStream out) {
-		this.output = out;
-	}
 
 	public XMLStreamReader getFixedHtmlReader(String sourceCode) {
 		XMLStreamReader reader = null;
-		output = new ByteArrayOutputStream();
+		ByteArrayOutputStream output=new ByteArrayOutputStream();
 		try {
 			xmlReader = XMLReaderFactory.createXMLReader(TAGSOUP_PARSER_CLASS);
 			Source input = new SAXSource(xmlReader, new InputSource(new ByteArrayInputStream(sourceCode.getBytes())));
@@ -55,7 +46,6 @@ public class HtmlErrorsFixer {
 			XMLStreamWriter xmlStreamWriter = OUTPUT_FACTORY.createXMLStreamWriter(output);
 			StAXResult staxResult = new StAXResult(xmlStreamWriter);
 			transformer.transform(input, staxResult);
-			setOutput(output);
 			InputStream inputStream = new ByteArrayInputStream(output.toByteArray());
 			reader = INPUT_FACTORY.createXMLStreamReader(inputStream);
 		} catch (TransformerFactoryConfigurationError | TransformerException e) {
