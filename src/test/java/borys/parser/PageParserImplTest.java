@@ -26,8 +26,7 @@ public class PageParserImplTest {
 	
 	@Test
 	public void getPageText() {
-		XMLStreamReader reader = HtmlErrorsFixer.fixer.getFixedHtmlReader(ConstantStringValues.TEXT_SEPARATION_INPUT);
-		String pageText = parser.getPageText(ConstantStringValues.TEXT_SEPARATION_INPUT, reader);
+		String pageText = parser.getPageText(ConstantStringValues.TEXT_SEPARATION_INPUT);
 		assertEquals(ConstantStringValues.TEXT_SEPARATION_EXPECTATION, pageText);
 		
 	}

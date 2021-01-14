@@ -61,13 +61,10 @@ public class HtmlErrorsFixer {
 		} catch (TransformerFactoryConfigurationError | TransformerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (SAXException e) {
+		} catch (SAXException | XMLStreamException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (XMLStreamException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		return reader;
 	}
 }

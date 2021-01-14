@@ -18,15 +18,14 @@ import by.softeq.borys.entity.Page;
 
 public class PageParserImpl implements Parser {
 	public static final PageParserImpl parser = new PageParserImpl();
-	private static final String CHARSET_TAG = "charset=\"";
+	private static HtmlErrorsFixer fixer = HtmlErrorsFixer.fixer;
+
+	private XMLStreamReader reader;
 	private Pattern pattern;
 	private Matcher matcher;
 
-	public PageParserImpl() {
-
-	}
-
-	public String getPageText(String sourceCode, XMLStreamReader reader) {
+	public String getPageText(String sourceCode) {
+		reader = fixer.getFixedHtmlReader(sourceCode);
 		StringBuilder sb = new StringBuilder();
 		try {
 			while (reader.hasNext()) {
@@ -51,20 +50,29 @@ public class PageParserImpl implements Parser {
 
 	}
 
-	public String getSourceCode(URL url) {
+	public String getSourceCode(URL url) throws IOException, XMLStreamException {
 		String sourceCode = getCode(url, "");
-		pattern = Pattern.compile(CHARSET_TAG);
-		matcher = pattern.matcher(sourceCode);
-		matcher.find();
-		int end = matcher.end();
-		StringBuilder charset = new StringBuilder();
-		char c = '\0';
-		while ((c = sourceCode.charAt(end)) != '"') {
-			charset.append(c);
-			end++;
+		reader = fixer.getFixedHtmlReader(sourceCode);
+		String pageCharset = getPageCharset(sourceCode, reader);
+		sourceCode = getCode(url, pageCharset);
+		reader.close();
+		return sourceCode;
+	}
+
+	public String getPageCharset(String sourceCode, XMLStreamReader reader) throws XMLStreamException {
+		String attributeValue = null;
+		while (reader.hasNext()) {
+			int type = reader.next();
+			if (type == XMLStreamReader.START_ELEMENT) {
+				if (reader.getLocalName().equals("meta")) {
+					attributeValue = reader.getAttributeValue(null, "charset");
+					if (attributeValue == null) {
+						continue;
+					}
+				}
+			}
 		}
-		String encodedCode = getCode(url, charset.toString());
-		return encodedCode.toString();
+		return (attributeValue == null) ? "utf-8" : attributeValue;
 	}
 
 	public Map<String, Integer> countGivenWords(Map<String, Integer> words, String pageContent) {
@@ -100,18 +108,17 @@ public class PageParserImpl implements Parser {
 		return sourceCode;
 	}
 
-	public Set<String> matchURLs(Page page, XMLStreamReader reader) {
+	public Set<String> matchURLs(Page page) {
+		reader = fixer.getFixedHtmlReader(page.getSourceCode());
 		Set<String> urlSet = new HashSet<String>();
 		int type = 0;
 		try {
 			while (reader.hasNext()) {
-				HtmlTagName element = null;
 				type = reader.next();
 				if (type == XMLStreamReader.START_ELEMENT) {
-					element = HtmlTagName.getElementTagName(reader.getLocalName());
-					if (element.equals(HtmlTagName.A)) {
+					if (reader.getLocalName().equals("a")) {
 						String attributeValue = reader.getAttributeValue(null, "href");
-						if (attributeValue == null) {
+						if (attributeValue == null || attributeValue.length() <= 1) {
 							continue;
 						}
 						if (attributeValue.substring(0, 2).equals("//")) {
@@ -142,13 +149,12 @@ public class PageParserImpl implements Parser {
 				}
 		}
 		return urlSet;
-
 	}
 
-	private String getCode(URL url, String charset) {
+	private String getCode(URL url, String charset) throws IOException {
 		StringBuilder code = new StringBuilder();
 		String string;
-		BufferedReader in;
+		BufferedReader in = null;
 		try {
 			if (charset.isEmpty()) {
 				in = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -159,58 +165,18 @@ public class PageParserImpl implements Parser {
 				code.append(string);
 				code.append("\n");
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		return code.toString();
 
 	}
 
-//	public void tagParce() throws IOException, SAXException, TransformerException {
-//	StringBuilder sb = new StringBuilder();
-//	XMLStreamReader reader = null;
-//	String attributeValue;
-//	try {
-//		reader = HtmlErrorsFixer.getFixedHtmlReader(url);
-//		while (reader.hasNext()) {
-//			HtmlTagName element = null;
-//			int type = reader.next();
-//			switch (type) {
-//			case XMLStreamReader.START_ELEMENT:
-//				element = HtmlTagName.getElementTagName(reader.getLocalName());
-//				switch (element) {
-//				case META:
-//					attributeValue = reader.getAttributeValue(null, "charset");
-//					System.out.println(attributeValue);
-//					break;
-//				case A:
-//					attributeValue = reader.getAttributeValue(null, "href");
-//					System.out.println(attributeValue);
-//				}
-//				break;
-//			case XMLStreamReader.CHARACTERS:
-//				String text = reader.getText().trim();
-//				if (!text.isEmpty()) {
-//					sb.append(text);
-//					sb.append(" ");
-//				}
-//				break;
-//			// default:
-//			// System.out.println("ERROR");//TODO fix
-//			}
-//		}
-//		System.out.println(sb);
-//	} catch (XMLStreamException e) {
-//		e.printStackTrace();
-//	} finally {
-//		if (reader != null)
-//			try {
-//				reader.close();
-//			} catch (XMLStreamException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//	}
-//}
 }

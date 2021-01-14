@@ -1,7 +1,8 @@
 package by.softeq.borys.entity;
 
 import java.net.URL;
-import java.util.HashMap;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -11,14 +12,12 @@ public class Page {
 	private String sourceCode;
 	private Map<String, Integer> words;
 	private Set<String> anotherURLs;
+	private Deque<String> anoterUrlsDeque;
 	private String pageContent;
 
-	public Page(URL url, String[] wordsArray) {
+	public Page(URL url, Map<String, Integer> wordsMap) {
 		this.url = url;
-		this.words = new HashMap<String, Integer>();
-		for (String s : wordsArray) {
-			words.put(s, Integer.valueOf(0));
-		}
+		this.words = wordsMap;
 	}
 
 	public URL getUrl() {
@@ -57,7 +56,19 @@ public class Page {
 	public void setPageContent(String pageContent) {
 		this.pageContent = pageContent;
 	}
+	public Deque<String> getAnoterUrlsDeque() {
+		return anoterUrlsDeque;
+	}
 
+	public void setAnoterUrlsDeque(Deque<String> anoterUrlsDeque) {
+		this.anoterUrlsDeque = anoterUrlsDeque;
+	}
+	
+	public void fillDeque() {
+		Deque<String> urls = new ArrayDeque<String>(anotherURLs);
+		this.anoterUrlsDeque=urls;
+		
+	}
 
 	@Override
 	public String toString() {
