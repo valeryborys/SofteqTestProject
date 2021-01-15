@@ -8,10 +8,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+/**
+ * JavaBean domain object that represents regular web-page
+ * 
+ * @author Valery Borys
+ * @version 1.0
+ *
+ */
 public class Page implements Serializable {
 
 	private static final long serialVersionUID = -57473167692038719L;
-	
+
 	private URL url;
 	private String sourceCode;
 	private Map<String, Integer> words;
@@ -53,7 +60,6 @@ public class Page implements Serializable {
 		this.anotherURLs = anotherURLs;
 	}
 
-	
 	public String getPageContent() {
 		return pageContent;
 	}
@@ -61,6 +67,7 @@ public class Page implements Serializable {
 	public void setPageContent(String pageContent) {
 		this.pageContent = pageContent;
 	}
+
 	public Deque<String> getAnoterUrlsDeque() {
 		return anoterUrlsDeque;
 	}
@@ -68,48 +75,103 @@ public class Page implements Serializable {
 	public void setAnoterUrlsDeque(Deque<String> anoterUrlsDeque) {
 		this.anoterUrlsDeque = anoterUrlsDeque;
 	}
-	
+
 	public void fillDeque() {
 		Deque<String> urls = new ArrayDeque<String>(anotherURLs);
-		this.anoterUrlsDeque=urls;
-		
+		this.anoterUrlsDeque = urls;
+
 	}
-	
+
 	public Integer getTotal() {
 		return total;
 	}
 
 	public void setTotal() {
-		Integer total=0;
-		for(Entry<String,Integer> entry: words.entrySet()) {
-			total+=entry.getValue();
+		Integer total = 0;
+		for (Entry<String, Integer> entry : words.entrySet()) {
+			total += entry.getValue();
 		}
-		this.total=total;
+		this.total = total;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(url.getProtocol()+"://"+url.getHost()+url.getPath()+", ");
+		sb.append(url.getProtocol() + "://" + url.getHost() + url.getPath() + ", ");
 		String delimiter = "";
 		for (Entry<String, Integer> entry : words.entrySet()) {
 			sb.append(delimiter);
 			sb.append(entry.getValue());
-			delimiter=", ";
+			delimiter = ", ";
 		}
 		return sb.toString();
 	}
-	
+
 	public String getClarification() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(url.getProtocol()+"://"+url.getHost()+url.getPath()+"\n");
-		//String delimiter = "";
+		sb.append(url.getProtocol() + "://" + url.getHost() + url.getPath() + "\n");
+		// String delimiter = "";
 		for (Entry<String, Integer> entry : words.entrySet()) {
-			sb.append(entry.getKey() + " - " + entry.getValue()+ " hits\n");
+			sb.append(entry.getKey() + " - " + entry.getValue() + " hits\n");
 		}
-		sb.append("Total - "+total+" hits");
+		sb.append("Total - " + total + " hits");
 		return sb.toString();
-		
+
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((anotherURLs == null) ? 0 : anotherURLs.hashCode());
+		result = prime * result + ((pageContent == null) ? 0 : pageContent.hashCode());
+		result = prime * result + ((sourceCode == null) ? 0 : sourceCode.hashCode());
+		result = prime * result + ((total == null) ? 0 : total.hashCode());
+		result = prime * result + ((url == null) ? 0 : url.hashCode());
+		result = prime * result + ((words == null) ? 0 : words.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Page other = (Page) obj;
+		if (anotherURLs == null) {
+			if (other.anotherURLs != null)
+				return false;
+		} else if (!anotherURLs.equals(other.anotherURLs))
+			return false;
+		if (pageContent == null) {
+			if (other.pageContent != null)
+				return false;
+		} else if (!pageContent.equals(other.pageContent))
+			return false;
+		if (sourceCode == null) {
+			if (other.sourceCode != null)
+				return false;
+		} else if (!sourceCode.equals(other.sourceCode))
+			return false;
+		if (total == null) {
+			if (other.total != null)
+				return false;
+		} else if (!total.equals(other.total))
+			return false;
+		if (url == null) {
+			if (other.url != null)
+				return false;
+		} else if (!url.equals(other.url))
+			return false;
+		if (words == null) {
+			if (other.words != null)
+				return false;
+		} else if (!words.equals(other.words))
+			return false;
+		return true;
 	}
 
 }

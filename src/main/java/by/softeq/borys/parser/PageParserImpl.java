@@ -15,7 +15,11 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import by.softeq.borys.entity.Page;
-
+/**
+ * Object of this class provides methods for page parsing.
+ * @author Valery Borys
+ *	@version 1.0
+ */
 public class PageParserImpl implements Parser {
 	public static final PageParserImpl parser = new PageParserImpl();
 	private static HtmlErrorsFixer fixer = HtmlErrorsFixer.fixer;
@@ -24,19 +28,15 @@ public class PageParserImpl implements Parser {
 	private Pattern pattern;
 	private Matcher matcher;
 
-	public String getPageText(String sourceCode) throws XMLStreamException {
-		reader = fixer.getFixedHtmlReader(sourceCode);
-		StringBuilder sb = new StringBuilder();
-		while (reader.hasNext()) {
-			int type = reader.next();
-			if (type == XMLStreamReader.CHARACTERS) {
-				sb.append(reader.getText().trim()).append(" ");
-			}
-		}
-		reader.close();
-		return sb.toString();
-	}
-
+	/**
+	 * Returns page source code
+	 * 
+	 * @param {@link URL} object of {@link Page} to get source code
+	 * @return {@link String} of HTML source code
+	 * @throws IOException
+	 * @throws XMLStreamException
+	 */
+	
 	public String getSourceCode(URL url) throws IOException, XMLStreamException {
 		String sourceCode = getCode(url, "");
 		reader = fixer.getFixedHtmlReader(sourceCode);
@@ -45,55 +45,15 @@ public class PageParserImpl implements Parser {
 		reader.close();
 		return sourceCode;
 	}
-
-	public String getPageCharset(String sourceCode, XMLStreamReader reader) throws XMLStreamException {
-		String attributeValue = null;
-		while (reader.hasNext()) {
-			int type = reader.next();
-			if (type == XMLStreamReader.START_ELEMENT) {
-				if (reader.getLocalName().equals("meta")) {
-					attributeValue = reader.getAttributeValue(null, "charset");
-					if (attributeValue != null) {
-						return attributeValue;
-					}
-				}
-			}
-		}
-		reader.close();
-		return "UTF-8";
-	}
-
-	public Map<String, Integer> countGivenWords(Map<String, Integer> words, String pageContent) {
-		for (Entry<String, Integer> entry : words.entrySet()) {
-			pattern = Pattern.compile(entry.getKey(), Pattern.CASE_INSENSITIVE);
-			matcher = pattern.matcher(pageContent);
-			int count = 0;
-			while (matcher.find()) {
-				count++;
-			}
-			entry.setValue(count);
-		}
-		return words;
-	}
-
-	public String deleteTagsWithContent(String sourceCode, String startTagName, String endTagName) {
-		StringBuilder sb = new StringBuilder(sourceCode);
-		pattern = Pattern.compile(startTagName, Pattern.CASE_INSENSITIVE);
-		Matcher matcherOpenTag = pattern.matcher(sourceCode);
-		if (matcherOpenTag.find()) {
-			int startTag = matcherOpenTag.start();
-			Pattern p = Pattern.compile(endTagName, Pattern.CASE_INSENSITIVE);
-			Matcher matcherCloseTag = p.matcher(sourceCode);
-			if (matcherCloseTag.find(startTag)) {
-				int endTag = matcherCloseTag.end();
-				sb.replace(startTag, endTag, "");
-				sourceCode = deleteTagsWithContent(sb.toString(), startTagName, endTagName);
-			}
-		}
-		return sourceCode;
-	}
-
-	public Set<String> matchURLs(Page page) throws XMLStreamException {
+	
+	/**
+	 * Parse {@link Page}, find all another URL's, and returns it's {@link Set}
+	 * @param source {@link Page} 
+	 * @return {@link Set} of all the {@link Page}  URL's found
+	 * @throws XMLStreamException
+	 */
+	
+	public Set<String> findAllURLs(Page page) throws XMLStreamException {
 		reader = fixer.getFixedHtmlReader(page.getSourceCode());
 		Set<String> urlSet = new HashSet<String>();
 		int type = 0;
@@ -122,7 +82,90 @@ public class PageParserImpl implements Parser {
 		reader.close();
 		return urlSet;
 	}
+	
+	/**
+	 * Method delete all information from open tag to close tag including content.
+	 * @param source code
+	 * @param startTagName
+	 * @param endTagName
+	 * @return
+	 */
+	
+	public String deleteTagsWithContent(String sourceCode, String startTagName, String endTagName) {
+		StringBuilder sb = new StringBuilder(sourceCode);
+		pattern = Pattern.compile(startTagName, Pattern.CASE_INSENSITIVE);
+		Matcher matcherOpenTag = pattern.matcher(sourceCode);
+		if (matcherOpenTag.find()) {
+			int startTag = matcherOpenTag.start();
+			Pattern p = Pattern.compile(endTagName, Pattern.CASE_INSENSITIVE);
+			Matcher matcherCloseTag = p.matcher(sourceCode);
+			if (matcherCloseTag.find(startTag)) {
+				int endTag = matcherCloseTag.end();
+				sb.replace(startTag, endTag, "");
+				sourceCode = deleteTagsWithContent(sb.toString(), startTagName, endTagName);
+			}
+		}
+		return sourceCode;
+	}
 
+	/**
+	 * Returns clean page content without any HTML tags or attributes.
+	 * 
+	 * @param {@link String} of HTML source code
+	 * @return {@link String} of cleaned from HTML page content
+	 * @throws XMLStreamException
+	 */
+	
+	public String getPageText(String sourceCode) throws XMLStreamException {
+		reader = fixer.getFixedHtmlReader(sourceCode);
+		StringBuilder sb = new StringBuilder();
+		while (reader.hasNext()) {
+			int type = reader.next();
+			if (type == XMLStreamReader.CHARACTERS) {
+				sb.append(reader.getText().trim()).append(" ");
+			}
+		}
+		reader.close();
+		return sb.toString();
+	}
+	
+	/**
+	 * Method provides page content parsing, looking for words matches and word counter increasing.
+	 * @param {@link Map} containing words as a key and empty counter values
+	 * @param {@link String} of cleaned from HTML page content
+	 * @return {@link Map} containing words as a key and counted values
+	 */
+	
+	public Map<String, Integer> countGivenWords(Map<String, Integer> words, String pageContent) {
+		for (Entry<String, Integer> entry : words.entrySet()) {
+			pattern = Pattern.compile(entry.getKey(), Pattern.CASE_INSENSITIVE);
+			matcher = pattern.matcher(pageContent);
+			int count = 0;
+			while (matcher.find()) {
+				count++;
+			}
+			entry.setValue(count);
+		}
+		return words;
+	}
+
+	private String getPageCharset(String sourceCode, XMLStreamReader reader) throws XMLStreamException {
+		String attributeValue = null;
+		while (reader.hasNext()) {
+			int type = reader.next();
+			if (type == XMLStreamReader.START_ELEMENT) {
+				if (reader.getLocalName().equals("meta")) {
+					attributeValue = reader.getAttributeValue(null, "charset");
+					if (attributeValue != null) {
+						return attributeValue;
+					}
+				}
+			}
+		}
+		reader.close();
+		return "UTF-8";
+	}
+	
 	private String getCode(URL url, String charset) throws IOException {
 		StringBuilder code = new StringBuilder();
 		String string;

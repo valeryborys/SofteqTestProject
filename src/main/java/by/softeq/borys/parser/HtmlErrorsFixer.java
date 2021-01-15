@@ -24,9 +24,11 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
+ * This class is provided for checking out and fixing HTML errors while parsing
+ * pages.
  * 
- * @author Valery Borys This class is provided for checking out and fixing HTML
- *         errors of the parsing pages.
+ * @author Valery Borys
+ * @version 1.0
  */
 
 public class HtmlErrorsFixer {
@@ -38,7 +40,7 @@ public class HtmlErrorsFixer {
 
 	public XMLStreamReader getFixedHtmlReader(String sourceCode) {
 		XMLStreamReader reader = null;
-		ByteArrayOutputStream output=new ByteArrayOutputStream();
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		try {
 			xmlReader = XMLReaderFactory.createXMLReader(TAGSOUP_PARSER_CLASS);
 			Source input = new SAXSource(xmlReader, new InputSource(new ByteArrayInputStream(sourceCode.getBytes())));
@@ -54,7 +56,7 @@ public class HtmlErrorsFixer {
 		} catch (SAXException | XMLStreamException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 		return reader;
 	}
 }
