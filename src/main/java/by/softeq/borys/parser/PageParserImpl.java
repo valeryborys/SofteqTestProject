@@ -21,7 +21,7 @@ import by.softeq.borys.entity.Page;
  *	@version 1.0
  */
 public class PageParserImpl implements Parser {
-	public static final PageParserImpl parser = new PageParserImpl();
+	public static final PageParserImpl PARSER = new PageParserImpl();
 	private static HtmlErrorsFixer fixer = HtmlErrorsFixer.fixer;
 
 	private XMLStreamReader reader;
@@ -30,13 +30,11 @@ public class PageParserImpl implements Parser {
 
 	/**
 	 * Returns page source code
-	 * 
 	 * @param {@link URL} object of {@link Page} to get source code
 	 * @return {@link String} of HTML source code
 	 * @throws IOException
 	 * @throws XMLStreamException
 	 */
-	
 	public String getSourceCode(URL url) throws IOException, XMLStreamException {
 		String sourceCode = getCode(url, "");
 		reader = fixer.getFixedHtmlReader(sourceCode);
@@ -45,14 +43,12 @@ public class PageParserImpl implements Parser {
 		reader.close();
 		return sourceCode;
 	}
-	
 	/**
 	 * Parse {@link Page}, find all another URL's, and returns it's {@link Set}
 	 * @param source {@link Page} 
 	 * @return {@link Set} of all the {@link Page}  URL's found
 	 * @throws XMLStreamException
 	 */
-	
 	public Set<String> findAllURLs(Page page) throws XMLStreamException {
 		reader = fixer.getFixedHtmlReader(page.getSourceCode());
 		Set<String> urlSet = new HashSet<String>();
@@ -82,7 +78,6 @@ public class PageParserImpl implements Parser {
 		reader.close();
 		return urlSet;
 	}
-	
 	/**
 	 * Method delete all information from open tag to close tag including content.
 	 * @param source code
@@ -90,7 +85,6 @@ public class PageParserImpl implements Parser {
 	 * @param endTagName
 	 * @return
 	 */
-	
 	public String deleteTagsWithContent(String sourceCode, String startTagName, String endTagName) {
 		StringBuilder sb = new StringBuilder(sourceCode);
 		pattern = Pattern.compile(startTagName, Pattern.CASE_INSENSITIVE);
@@ -107,15 +101,12 @@ public class PageParserImpl implements Parser {
 		}
 		return sourceCode;
 	}
-
 	/**
 	 * Returns clean page content without any HTML tags or attributes.
-	 * 
 	 * @param {@link String} of HTML source code
 	 * @return {@link String} of cleaned from HTML page content
 	 * @throws XMLStreamException
 	 */
-	
 	public String getPageText(String sourceCode) throws XMLStreamException {
 		reader = fixer.getFixedHtmlReader(sourceCode);
 		StringBuilder sb = new StringBuilder();
@@ -128,14 +119,12 @@ public class PageParserImpl implements Parser {
 		reader.close();
 		return sb.toString();
 	}
-	
 	/**
 	 * Method provides page content parsing, looking for words matches and word counter increasing.
 	 * @param {@link Map} containing words as a key and empty counter values
 	 * @param {@link String} of cleaned from HTML page content
 	 * @return {@link Map} containing words as a key and counted values
 	 */
-	
 	public Map<String, Integer> countGivenWords(Map<String, Integer> words, String pageContent) {
 		for (Entry<String, Integer> entry : words.entrySet()) {
 			pattern = Pattern.compile(entry.getKey(), Pattern.CASE_INSENSITIVE);
@@ -148,7 +137,6 @@ public class PageParserImpl implements Parser {
 		}
 		return words;
 	}
-
 	private String getPageCharset(String sourceCode, XMLStreamReader reader) throws XMLStreamException {
 		String attributeValue = null;
 		while (reader.hasNext()) {
@@ -165,7 +153,6 @@ public class PageParserImpl implements Parser {
 		reader.close();
 		return "UTF-8";
 	}
-	
 	private String getCode(URL url, String charset) throws IOException {
 		StringBuilder code = new StringBuilder();
 		String string;

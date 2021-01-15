@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>by.softeq</groupId>
 	<artifactId>borys</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+ 	<version>0.0.1-SNAPSHOT</version> 
 	<name>SofteqTestProject</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,28 +28,9 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.6</version>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<configuration>
-							<configLocation>checkstyle.xml</configLocation>
-							<encoding>UTF-8</encoding>
-							<consoleOutput>true</consoleOutput>
-							<failsOnError>false</failsOnError>
-						</configuration>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
-					<encoding>UTF-8</encoding>
+				<encoding>UTF-8</encoding>
 					<archive>
 						<manifest>
 							<mainClass>by.softeq.borys.Main</mainClass>

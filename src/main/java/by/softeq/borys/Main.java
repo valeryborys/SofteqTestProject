@@ -20,13 +20,12 @@ import by.softeq.borys.counter.CountManagerImpl;
 
 /**
  * Program initialization class.
- * 
  * @author Valery Borys
  * @version 1.0
  */
 
 public class Main {
-	private static String exportPath = "D://csv's";
+	private static String exportPath = "/home/valery/eclipse-workspace2/SofteqTestProject/export";
 
 	/**
 	 * Main method. Requests input information from user and initializes pages
@@ -34,12 +33,12 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
-		System.out.println("Enter star page URL:");
+		System.out.println("Enter start page URL:");
 		String startPage = scanner.nextLine();
 		System.out.println("Enter words separeted with comma to find matches (example \"One, to, play, a car \"):");
 		String wordsInput = scanner.nextLine();
-		System.out.println(
-				"Enter package path to export *.csv files(example \"D://csv's\" or \"/home/user/csv's\"or press Enter \"D://csv's\" used by default)):");
+		System.out
+				.println("Enter package path to export *.csv files(example \"D://export\" or \"/home/user/export\"):");
 		String getExportPath = scanner.nextLine();
 		scanner.close();
 		Map<String, Integer> map = getMap(wordsInput);
@@ -49,6 +48,7 @@ public class Main {
 		}
 		Set<String> resultSet = counter.countPageWords(startPage, new HashSet<String>());
 		serialize(resultSet);
+		printToFile(resultSet);
 		Map<Integer, String> topWordUsages = counter.getTopUsages();
 		printTopToCSV(topWordUsages);
 		System.out.println();
@@ -58,19 +58,16 @@ public class Main {
 			System.out.println(entry.getValue());
 		}
 	}
-
 	/**
-	 * Method provides result statistics serialization.
-	 * 
+	 * Method provides result statistics serialization. 
 	 * @param {@link Set} containing global statistic information
 	 */
-
 	private static void serialize(Set<String> resultSet) {
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(exportPath + "/serialize.csv"))) {
 			oos.writeObject(resultSet);
 		} catch (IOException e) {
 			System.err.println(
-					"Statistic data serialization connot be provided: the export path given is not avaliable!");
+					"Statistic data serialization connot be provided: the export path given is not avaliable or output file is blocked by another process!");
 		}
 
 	}
@@ -78,7 +75,6 @@ public class Main {
 	/**
 	 * Method convert inputed String of words that user wants to find to the
 	 * {@link Map}.
-	 * 
 	 * @param String of the words list entered by the user
 	 * @return {@link Map} of the Strings to parse as a key and {@link Integer} of
 	 *         its matches("0" by default)
@@ -95,7 +91,6 @@ public class Main {
 
 	/**
 	 * Method prints top pages by total usages to the *.csv separated files.
-	 * 
 	 * @param map of the top usages statistics
 	 */
 	public static void printTopToCSV(Map<Integer, String> map) {
@@ -109,9 +104,29 @@ public class Main {
 				System.out.println("UnsupportedEncodingException. Check encode");
 			} catch (FileNotFoundException e) {
 				System.err.println(
-						"Clarification of top usages connot be provided: the export path given is not avaliable!");
+						"Clarification of top usages connot be provided: the export path given is not avaliable or output file is blocked by another process!");
 			}
 		}
+	}
+
+	/**
+	 * Method prints all statistics to *.csv file.
+	 * @param map of the top usages statistics
+	 */
+
+	public static void printToFile(Set<String> set) {
+		try (PrintWriter out = new PrintWriter(new OutputStreamWriter(
+				new FileOutputStream(exportPath + File.separator + "statistics.csv"), "UTF-8"))) {
+			for (String s : set) {
+				out.println(s);
+			}
+		} catch (UnsupportedEncodingException e) {
+			System.out.println("UnsupportedEncodingException. Check encode");
+		} catch (FileNotFoundException e) {
+			System.err.println(
+					"Print of statistics connot be provided: the export path given is not avaliable or output file is blocked by another process!");
+		}
+
 	}
 
 }

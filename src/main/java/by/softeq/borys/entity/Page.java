@@ -9,11 +9,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
- * JavaBean domain object that represents regular web-page
- * 
+ * JavaBean domain object that represents regular web-page.
  * @author Valery Borys
  * @version 1.0
- *
  */
 public class Page implements Serializable {
 
@@ -101,7 +99,7 @@ public class Page implements Serializable {
 		String delimiter = "";
 		for (Entry<String, Integer> entry : words.entrySet()) {
 			sb.append(delimiter);
-			sb.append(entry.getValue());
+			sb.append(entry.getKey() + "=" + entry.getValue());
 			delimiter = ", ";
 		}
 		return sb.toString();
@@ -116,7 +114,6 @@ public class Page implements Serializable {
 		}
 		sb.append("Total - " + total + " hits");
 		return sb.toString();
-
 	}
 
 	@Override
@@ -134,43 +131,58 @@ public class Page implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+			}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+			}
+		if (getClass() != obj.getClass()) {
 			return false;
+			}
 		Page other = (Page) obj;
 		if (anotherURLs == null) {
-			if (other.anotherURLs != null)
+			if (other.anotherURLs != null) {
 				return false;
-		} else if (!anotherURLs.equals(other.anotherURLs))
+				}
+		} else if (!anotherURLs.equals(other.anotherURLs)) {
 			return false;
+			}
 		if (pageContent == null) {
-			if (other.pageContent != null)
+			if (other.pageContent != null) {
 				return false;
-		} else if (!pageContent.equals(other.pageContent))
+				}
+		} else if (!pageContent.equals(other.pageContent)) {
 			return false;
+			}
 		if (sourceCode == null) {
-			if (other.sourceCode != null)
+			if (other.sourceCode != null) {
 				return false;
-		} else if (!sourceCode.equals(other.sourceCode))
+				}
+		} else if (!sourceCode.equals(other.sourceCode)) {
 			return false;
+			}
 		if (total == null) {
-			if (other.total != null)
+			if (other.total != null) {
 				return false;
-		} else if (!total.equals(other.total))
+				}
+		} else if (!total.equals(other.total)) {
 			return false;
+			}
 		if (url == null) {
-			if (other.url != null)
+			if (other.url != null) {
 				return false;
-		} else if (!url.equals(other.url))
+				}
+		} else if (!url.equals(other.url)) {
 			return false;
+			}
 		if (words == null) {
-			if (other.words != null)
+			if (other.words != null) {
 				return false;
-		} else if (!words.equals(other.words))
+				}
+		} else if (!words.equals(other.words)) {
 			return false;
+			}
 		return true;
 	}
 

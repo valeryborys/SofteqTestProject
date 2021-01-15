@@ -14,34 +14,30 @@ import by.softeq.borys.handler.PageHandler;
 import by.softeq.borys.handler.PageHandlerImpl;
 
 /**
- * Implementation of {@link CountManager} interface}
- * 
+ * Implementation of {@link CountManager} interface}.
  * @author Valery Borys
  * @version 1.0
- * 
  */
 
 public class CountManagerImpl implements CountManager {
 	private Map<String, Integer> wordsToCount;
 	private static final int MAX_DEPTH_LEVEL = 8;
-	private static final int VISITED_PAGES_LIMIT = 10000;
+	private static final int VISITED_PAGES_LIMIT = 100;
 	private static final int TOP_WORDS_USAGES_QUANTITY = 10;
 	private Set<String> checkedPages = new HashSet<String>();
-	private Map<Integer, String> topWordUsages = new TreeMap<>((o1, o2) -> o2.compareTo(o1));
-	private int depthLevel = 0;
-	private int visitedPages = 0;
+	private Map<Integer, String> topWordUsages = new TreeMap<Integer, String>((o1, o2) -> o2.compareTo(o1));
+	private static int depthLevel = 0;
+	private static int visitedPages = 0;
 
 	public CountManagerImpl(Map<String, Integer> map) {
 		this.wordsToCount = map;
-
 	}
 
 	/**
 	 * Method check out all the pages and collect given words usages statistics.
-	 * 
-	 * @param {@link String} url to match words
-	 * @param {@link Set} containing global statistic information
-	 * @return {@link Set} containing global statistic information
+	 * @param {@link String} url to match words.
+	 * @param {@link Set} containing global statistic information.
+	 * @return {@link Set} containing global statistic information.
 	 */
 	public Set<String> countPageWords(String urlString, Set<String> resultSet) {
 		try {
@@ -80,8 +76,7 @@ public class CountManagerImpl implements CountManager {
 		}
 	}
 
-	/**
-	 * 
+	/** 
 	 * @return {@link Map} statistics information sorted by total usages.
 	 */
 	public Map<Integer, String> getTopUsages() {

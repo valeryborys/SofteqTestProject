@@ -12,22 +12,20 @@ import by.softeq.borys.parser.Parser;
 /**
  * Implementation of {@link PageHandler} interface. Object of this class
  * responsible for page processing and it's fields filling.
- * 
  * @author Valery Borys
  * @version 1.0
- * 
  */
 public class PageHandlerImpl implements PageHandler {
 	public static final PageHandlerImpl HANDLER = new PageHandlerImpl();
-	private static Parser parser = PageParserImpl.parser;
+	private static Parser parser = PageParserImpl.PARSER;
 
 	private PageHandlerImpl() {
 	}
 
 	/**
 	 * Method handles page and fills all the empty fields of the Page JavaBean
-	 * 
 	 * @param Page object needed to process
+	 * @throws IOException
 	 */
 	public void handlePage(Page page) throws IOException {
 		try {
@@ -47,15 +45,13 @@ public class PageHandlerImpl implements PageHandler {
 
 	/**
 	 * Method delete waste information between open and close tag with content.
-	 * between.
-	 * 
 	 * @param String source code of the page
 	 * @return cleaned page source code
 	 */
 	private String deleteWasteTags(String sourceCode) {
-		String[][] tagsToDelete = new String[][] { { "<head", "</head>" }, { "<script", "</script>" },
-				{ "<style", "</style>" }, { "<style", ">" }, { "<meta", "</meta>" }, { "<meta", ">" },
-				{ "<option", "</option>" }, { "<option", ">" } };
+		String[][] tagsToDelete = new String[][] {{"<head", "</head>" }, {"<script", "</script>" },
+				{"<style", "</style>" }, {"<style", ">" }, {"<meta", "</meta>" }, {"<meta", ">" },
+				{"<option", "</option>" }, {"<option", ">" }};
 		for (int i = 0; i < tagsToDelete.length; i++) {
 			sourceCode = parser.deleteTagsWithContent(sourceCode, tagsToDelete[i][0], tagsToDelete[i][1]);
 		}

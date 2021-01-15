@@ -26,7 +26,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
  * This class is provided for checking out and fixing HTML errors while parsing
  * pages.
- * 
  * @author Valery Borys
  * @version 1.0
  */
@@ -50,13 +49,10 @@ public class HtmlErrorsFixer {
 			transformer.transform(input, staxResult);
 			InputStream inputStream = new ByteArrayInputStream(output.toByteArray());
 			reader = INPUT_FACTORY.createXMLStreamReader(inputStream);
-		} catch (TransformerFactoryConfigurationError | TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (TransformerException e) {
+			System.err.println("Transformer Exception occured");
 		} catch (SAXException | XMLStreamException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return reader;
+			System.err.println("XML transformation exception");
+		} return reader;
 	}
 }
